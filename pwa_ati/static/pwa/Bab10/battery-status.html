@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Demo API Status Baterai</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <style>
+	.navbar-header{float:left;padding:12px;text-align:center;width:100%;}
+	.navbar-brand{float:none;font-weight:bold;}
+  </style>
+</head>
+<body>
+<nav class="navbar navbar-default" role="navigation">
+  <div class="navbar-header">
+    <span class="navbar-brand">Demo API Status Baterai</span>
+  </div>
+</nav>
+<div class="container" style="margin-top:10px">
+
+<p>Status baterai : <b id="charging">unknown</b></p>
+<p>Charging time : <b id="chargingTime">unknown</b></p> 
+<p>Discharging time : <b id="dischargingTime">unknown</b></p>
+<p>Baterai Level : <b id="level">unknown</b>.</p>
+<div id="target"></div>
+
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script>
+if ('getBattery' in navigator || ('battery' in navigator && 'Promise' in window)) {
+  var target = document.getElementById('target');
+
+  function handleChange(change) {
+    var timeBadge = new Date().toTimeString().split(' ')[0];
+    var newState = document.createElement('p');
+    newState.innerHTML = '<span class="badge">' + timeBadge + '</span> ' + change + '.';
+    target.appendChild(newState);
+  }
+  
+  function onChargingChange() {
+    handleChange('Battery charging changed to <b>' + (this.charging ? 'charging' : 'discharging') + '</b>')
+  }
+  function onChargingTimeChange() {
+    handleChange('Battery charging time changed to <b>' + this.chargingTime + ' s</b>');
+  }
+  function onDischargingTimeChange() {
+    handleChange('Battery discharging time changed to <b>' + this.dischargingTime/3600 + ' s</b>');
+  }
+  function onLevelChange() {
+    handleChange('Battery level changed to <b>' + this.level + '</b>');
+  }
+
+  var batteryPromise;
+  
+  if ('getBattery' in navigator) {
+    batteryPromise = navigator.getBattery();
+  } else {
+    batteryPromise = Promise.resolve(navigator.battery);
+  }
+  
+  batteryPromise.then(function (battery) {
+    document.getElementById('charging').innerHTML = battery.charging ? 'charging' : 'discharging';
+    document.getElementById('chargingTime').innerHTML = battery.chargingTime/60 + ' min';
+    document.getElementById('dischargingTime').innerHTML = battery.dischargingTime/60 + ' min';
+    document.getElementById('level').innerHTML = battery.level*100 + ' %';
+    
+    battery.addEventListener('chargingchange', onChargingChange);
+    battery.addEventListener('chargingtimechange', onChargingTimeChange);
+    battery.addEventListener('dischargingtimechange', onDischargingTimeChange);
+    battery.addEventListener('levelchange', onLevelChange);
+  });
+}
+</script>
+</body>
+</html>

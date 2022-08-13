@@ -1,0 +1,86 @@
+<odoo>
+	<data>
+		<!-- explicit list view definition -->
+		<record model="ir.ui.view" id="pwa_ati.data_diri_form">
+			<field name="name">Data Diri
+			</field>
+			<field name="model">data.diri</field>
+			<field name="arch" type="xml">
+				<form>
+					<header>
+						<button name="data_diri_url"
+							string="Buka Halaman Data Diri" type="object" />
+						<button name="data_diri_lokasi" string="Dapatkan Lokasi"
+							type="object" />
+						<button name="data_diri_photo" string="Dapatkan Photo"
+							type="object" />
+					</header>
+					<sheet>
+						<group>
+							<field name="nama" />
+							<field name="alamat" />
+							<field name="photo" widget="image" />
+						</group>
+						<notebook>
+							<page string="Location">
+								<field name="location_ids">
+									<tree>
+										<field name="longitude" />
+										<field name="latitude" />
+									</tree>
+								</field>
+							</page>
+						</notebook>
+					</sheet>
+				</form>
+			</field>
+		</record>
+
+		<record model="ir.ui.view" id="pwa_ati.data_diri_list">
+			<field name="name">Data Diri
+			</field>
+			<field name="model">data.diri</field>
+			<field name="arch" type="xml">
+				<tree>
+					<field name="nama" />
+					<field name="alamat" />
+				</tree>
+			</field>
+		</record>
+
+		<!-- actions opening views on models -->
+
+		<record model="ir.actions.act_window"
+			id="pwa_ati.data_diri_action_window">
+			<field name="name">Data Diri</field>
+			<field name="res_model">data.diri</field>
+			<field name="view_mode">tree,form</field>
+		</record>
+
+
+		<!-- server action to the one above -->
+		<!-- <record model="ir.actions.server" id="pwa_ati.action_server"> <field 
+			name="name">pwa_ati server</field> <field name="model_id" ref="model_pwa_ati_pwa_ati"/> 
+			<field name="state">code</field> <field name="code"> action = { "type": "ir.actions.act_window", 
+			"view_mode": "tree,form", "res_model": self._name, } </field> </record> -->
+
+		<!-- Top menu item -->
+
+		<menuitem name="PWA" id="pwa_ati.menu_root" />
+
+		<!-- menu categories -->
+
+		<menuitem name="Master Data" id="pwa_ati.menu_master_data"
+			parent="pwa_ati.menu_root" />
+		<!-- <menuitem name="Menu 2" id="pwa_ati.menu_2" parent="pwa_ati.menu_root"/> -->
+
+		<!-- actions -->
+
+		<menuitem name="Data Diri" id="pwa_ati.menu_data_diri_list"
+			parent="pwa_ati.menu_master_data"
+			action="pwa_ati.data_diri_action_window" />
+		<!-- <menuitem name="Server to list" id="pwa_ati" parent="pwa_ati.menu_2" 
+			action="pwa_ati.action_server"/> -->
+
+	</data>
+</odoo>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Demo API Payment Request</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <style>
+	.navbar-header{float:left;padding:12px;text-align:center;width:100%;}
+	.navbar-brand{float:none;font-weight:bold;}
+  </style>
+</head>
+<body>
+<nav class="navbar navbar-default" role="navigation">
+  <div class="navbar-header">
+    <span class="navbar-brand">Demo API Payment Request</span>
+  </div>
+</nav>
+<div class="container">
+<p><button class="btn btn-default" onclick="donate()">Donasi $10 untuk 'What Web Can Do' 😉</button></p>
+<p>(Hanya demo, tidak ada pembayaran yang seberanya di proses.)</p>
+<p id="log"></p>
+<p><small>Demo berdasarkan <a href="https://googlechrome.github.io/samples/paymentrequest/credit-cards/">Google Chrome GitHub repository</a>.</small></p>
+<p id="logTarget"></p>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script>
+/**
+ * Membuat Payment Request untuk credit card, tanpa menampilkan UI.
+ */
+function initPaymentRequest() {
+  let networks = ['amex', 'jcb', 'visa'];
+  
+  let supportedInstruments = [{
+    supportedMethods: 'basic-card',
+    data: {
+      supportedNetworks: networks, 
+      supportedTypes: ['debit', 'credit', 'prepaid']
+    }
+  }, {
+    supportedMethods: 'https://apple.com/apple-pay',
+    data: {
+        version: 2,
+        supportedNetworks: networks,
+        countryCode: 'US',
+        merchantIdentifier: 'whatwebcando.today.sample',
+        merchantCapabilities: ['supportsDebit', 'supportsCredit', 'supports3DS']
+    }
+  }];
+
+  let details = {
+    total: {label: 'Donation', amount: {currency: 'IDR', value: '10.00'}},
+    displayItems: [
+      {
+        label: 'Original donation amount',
+        amount: {currency: 'IDR', value: '10.00'}
+      },
+      {
+        label: 'Friends and family discount',
+        amount: {currency: 'IDR', value: '-5.00'}
+      }
+    ]
+  };
+
+  return new PaymentRequest(supportedInstruments, details);
+}
+
+/**
+ * Panggil PaymentRequest untuk credit cards.
+ */
+function onBuyClicked(request) {
+  request.show()
+    .then(instrumentResponse => sendPaymentToServer(instrumentResponse))
+    .catch(err => document.getElementById('log').innerText = err);
+}
+
+/**
+ * Simulasi proses payment data di server.
+ */
+function sendPaymentToServer(instrumentResponse) {
+  // Tidak ada komponen server-side pada script ini. Tidak ada transaksi yang diproses
+  // dan tidak ada uang yang di transfer. Instansiasi transaksi tidak nyata.
+  // Tambahkan 2 detik delay untuk simulasi real.
+  window.setTimeout(function () {
+    instrumentResponse.complete('success')
+        .then(() => document.getElementById('log').innerHTML = resultToTable(instrumentResponse))
+        .catch(err => document.getElementById('log').innerText = err);
+  }, 2000);
+}
+
+/**
+ * Convert payment instrument ke JSON string.
+ */
+function resultToTable(result) {
+  return '<table class="table table-striped">' +
+    '<tr><td>Method name</td><td>' + result.methodName + '</td></tr>' +
+    '<tr><td>Billing address</td><td>' + (result.details.billingAddress || {}).addressLine + ', ' + (result.details.billingAddress || {}).city + '</td></tr>' +
+    '<tr><td>Card number</td><td>' + result.details.cardNumber + '</td></tr>' +
+    '<tr><td>Security code</td><td>' + result.details.cardSecurityCode + '</td></tr>' +
+    '<tr><td>Cardholder name</td><td>' + result.details.cardholderName + '</td></tr>' +
+    '<tr><td>Expiry date</td><td>' + result.details.expiryMonth + '/' + result.details.expiryYear + '</td></tr>' +
+    '</table>';
+}
+
+function donate() {
+  if (!window.PaymentRequest) {
+    alert('This browser does not support Web Payments API');
+    return;
+  }
+    
+  let request = initPaymentRequest();
+  onBuyClicked(request);
+}
+</script>
+</body>
+</html>

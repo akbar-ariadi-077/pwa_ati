@@ -1,0 +1,188 @@
+<odoo>
+	<data>
+		<template id="assets_frontend"
+			inherit_id="website.assets_frontend" name="Latihan Asset">
+			<xpath expr="." position="inside">
+				<script type="text/javascript"
+					src="/pwa_ati/static/js/script.js" />
+			</xpath>
+		</template>
+		<template id="assets_backend" inherit_id="web.assets_backend"
+			name="Latihan Asset Backend">
+			<xpath expr="." position="inside">
+				<script type="text/javascript"
+					src="/pwa_ati/static/js/odoo-script.js" />
+			</xpath>
+		</template>
+		<!-- <template id="assets_commond" inherit_id="web.assets_commond" name="Latihan 
+			Asset"> <xpath expr="." position="inside"> <script type="text/javascript" 
+			src="/pwa_ati/static/src/js/script.js" /> </xpath> </template> -->
+		<template id="pwa_tbody_template">
+			<t t-set="nomor" t-value="1" />
+			<tr t-foreach="table_list" t-as="table_data">
+				<td>
+					<t t-esc="nomor" />
+				</td>
+				<td>
+					<t t-esc="table_data['nama']" />
+				</td>
+				<td>
+					<t t-esc="table_data['alamat']" />
+				</td>
+				<td>
+					<a t-att-href="'#action=edit&amp;id=%s' % (table_data['id'])">Edit</a>
+					<a t-att-href="'#action=hapus&amp;id=%s' % (table_data['id'])">Hapus</a>
+				</td>
+				<t t-set="nomor" t-value="nomor+1" />
+			</tr>
+		</template>
+		<template id="pwa_template">
+			<t t-call="website.layout">
+				<section class="container">
+					<div class="row">
+						<div class="col-xs-12">
+							<table id="tabel_diri" border="1"
+								style="table-layout:fixed;width:100%;">
+								<thead>
+									<tr>
+										<th>Nomor</th>
+										<th>Nama</th>
+										<th>Alamat</th>
+										<th>Aksi</th>
+									</tr>
+								</thead>
+								<tbody id="tabel_diri_body">
+									<t t-call="pwa_ati.pwa_tbody_template" />
+								</tbody>
+								<tbody>
+									<tr>
+										<td colspan="4">
+											<a href="#action=tambah">Tambah</a>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+							<div id="pwa_form" />
+						</div>
+					</div>
+				</section>
+				<script>
+					function hash_listener() {
+					var url_loc = "" +
+					window.location;
+					var hash_data = url_loc.split('#')[1];
+					var
+					url_params = new URLSearchParams('?' + hash_data);
+					if(url_params.has('id')) {
+					pwa_post_action(url_params.get('action')
+					+ ' ' + url_params.get('id'));
+					} else {
+					pwa_post_action(url_params.get('action'));
+					}
+					}
+					window.addEventListener('hashchange', hash_listener);
+					hash_listener();
+				</script>
+			</t>
+		</template>
+		<template id="pwa_a2hs">
+			<html>
+				<head>
+					<title>PWA Add to Homescreen</title>
+					<meta charset="utf-8" />
+					<meta name='viewport'
+						content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' />
+					<link rel="icon"
+						href="/pwa_ati/static/pwa/Bab4/pwa-addtohomescreen/logo.png"
+						type="image/png" />
+					<link rel="manifest" href="manifest.json" />
+				</head>
+				<body>
+					<!-- <div>Demo PWA Add to Homescreen</div> <p align="center"> <button 
+						id="install">Install App on Device</button> </p> -->
+					<table border="1">
+						<thead>
+							<tr>
+								<th>Nama</th>
+								<th>Alamat</th>
+								<th><a href="javascript:$('#pwa_table_tambah').toggle()">Tambah</a></th>
+							</tr>
+						</thead>
+						<tbody id="pwa_table_body"></tbody>
+						<tbody id="pwa_table_tambah">
+							<tr>
+								<td colspan="3">
+									<table>
+										<tr>
+											<td>Nama</td>
+											<td>
+												<input type="text" id="pwa_tambah_nama" />
+											</td>
+										</tr>
+										<tr>
+											<td>Alamat</td>
+											<td>
+												<input type="text" id="pwa_tambah_alamat" />
+											</td>
+										</tr>
+										<tr>
+											<td colspan="2">
+												<a href="javascript:tambahBaris()">Submit</a>
+											</td>
+										</tr>
+									</table>
+								</td>
+							</tr>
+						</tbody>
+						<tbody id="pwa_table_edit">
+							<tr>
+								<td colspan="3">
+									<table>
+										<tr>
+											<td>Nama</td>
+											<td>
+												<input type="text" id="pwa_edit_nama" />
+											</td>
+										</tr>
+										<tr>
+											<td>Alamat</td>
+											<td>
+												<input type="text" id="pwa_edit_alamat" />
+											</td>
+										</tr>
+										<tr>
+											<td colspan="2">
+												<a id="pwa_edit_submit">Submit</a>
+											</td>
+										</tr>
+									</table>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<p align="center">
+						<button id="install">Install App on Device</button>
+						<button id="show_notif" onclick="displayNotification()">Show Notification</button>
+						<button id="show_notif" onclick="displayNotification2()">Show Notification 2</button>
+					</p>
+					<script>
+						if('serviceWorker' in navigator){
+							// Register service worker
+							navigator.serviceWorker.register('sw.js').then(function(reg){
+								console.log("SW registration succeeded. Scope is "+reg.scope);
+							}).catch(function(err){
+								console.error("SW registration failed with error "+err);
+							});
+						}
+					</script>
+					<script type="text/javascript"
+						src="/web/static/lib/jquery/jquery.js"></script>
+					<script src="/pwa_ati/static/js/db.js"></script>
+					<script src="/pwa_ati/static/js/notif.js"></script>
+					<script
+						src="/pwa_ati/static/pwa/Bab4/pwa-addtohomescreen/A2HS.js"></script>
+				</body>
+			</html>
+		</template>
+	</data>
+</odoo>

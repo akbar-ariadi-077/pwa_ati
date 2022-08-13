@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Demo API Network</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <style>
+	.navbar-header{float:left;padding:12px;text-align:center;width:100%;}
+	.navbar-brand{float:none;font-weight:bold;}
+  </style>
+</head>
+<body>
+<nav class="navbar navbar-default" role="navigation">
+  <div class="navbar-header">
+    <span class="navbar-brand">Demo API Tipe dan Kecepatan Jaringan</span>
+  </div>
+</nav>
+<div class="container" style="margin-top: 10px">
+
+<p>Tipe network saat ini : <b id="networkType">not available</b>.</p>
+<p>Tipe network efektif : <b id="effectiveNetworkType">not available</b>.</p>
+<p>Max downlink speed : <b id="downlinkMax">not available</b>.
+
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script>
+function getConnection() {
+  return navigator.connection || navigator.mozConnection ||
+    navigator.webkitConnection || navigator.msConnection;
+}
+
+function updateNetworkInfo(info) {
+  document.getElementById('networkType').innerHTML = info.type;
+  document.getElementById('effectiveNetworkType').innerHTML = info.effectiveType;
+  document.getElementById('downlinkMax').innerHTML = info.downlinkMax;
+}
+
+var info = getConnection();
+if (info) {
+  info.addEventListener('change', updateNetworkInfo);
+  updateNetworkInfo(info);
+}
+</script>
+</body>
+</html>

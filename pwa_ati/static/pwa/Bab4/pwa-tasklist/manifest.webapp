@@ -1,0 +1,33 @@
+{
+  "version": "0.1",
+  "short_name": "Task List",
+  "name": "Task List",
+  "description": "Catat pekerjaan Anda, dan ingatkan tenggat waktunya.",
+  "launch_path": "/tasklist/index.html",
+  "icons": [
+    {
+      "src": "img/icon192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+	{
+      "src": "img/icon256.png",
+      "type": "image/png",
+      "sizes": "256x256"
+    },    
+    {
+      "src": "img/icon512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "./",
+  "background_color": "#ffaa00",
+  "theme_color": "#ffaa00",
+  "display": "standalone",
+  "permissions": {
+    "desktop-notification": {
+      "description": "Permisi akses notifikasi sistem."
+    }
+  }
+}

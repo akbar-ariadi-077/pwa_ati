@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Demo Web Bluetooth</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <style>
+	.navbar-header{float:left;padding:12px;text-align:center;width:100%;}
+	.navbar-brand{float:none;font-weight:bold;}
+  </style>
+</head>
+<body>
+<nav class="navbar navbar-default" role="navigation">
+  <div class="navbar-header">
+    <span class="navbar-brand">Demo Web Bluetooth</span>
+  </div>
+</nav>
+<div class="container" style="margin-top: 10px">
+	<p>
+	<button class="btn btn-lg btn-default" onclick="readBatteryLevel()">Read Bluetooth device's<br>battery level</button>
+	</p>
+	<p id="target"></p>
+	<p><small>Based on code snippets from <a href="https://developers.google.com/web/updates/2015/07/interact-with-ble-devices-on-the-web" target="_blank">Google Developers</a>.</small></p>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script>
+function readBatteryLevel() {
+  var $target = document.getElementById('target');
+  if (!('bluetooth' in navigator)) {
+    $target.innerText = 'Bluetooth API not supported.';
+    return;
+  }  
+  navigator.bluetooth.requestDevice({
+      filters: [{
+        services: ['battery_service']
+      }]
+    })
+    .then(function (device) {
+      return device.gatt.connect();
+    })
+    .then(function (server) {
+      return server.getPrimaryService('battery_service');
+    })
+    .then(function (service) {
+      return service.getCharacteristic('battery_level');
+    })
+    .then(function (characteristic) {
+      return characteristic.readValue();
+    })
+    .then(function (value) {
+      $target.innerHTML = 'Battery percentage is <b>' + value.getUint8(0) + '</b>.';
+    })
+    .catch(function (error) {
+      $target.innerText = error;
+    });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Demo Web USB</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <style>
+	.navbar-header{float:left;padding:12px;text-align:center;width:100%;}
+	.navbar-brand{float:none;font-weight:bold;}
+  </style>
+</head>
+<body>
+<nav class="navbar navbar-default" role="navigation">
+  <div class="navbar-header">
+    <span class="navbar-brand">Demo Web USB</span>
+  </div>
+</nav>
+<div class="container" style="margin-top: 10px">
+	<button class="btn btn-default" id="arduinoButton">Talk to Arduino</button>
+	<div id="target"></div>
+	<p><small>Demo from <a href="https://developers.google.com/web/updates/2016/03/access-usb-devices-on-the-web" target="_blank">Google Developers</a> article.</small></p>
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script>
+document.getElementById('arduinoButton').addEventListener('click', function () {
+  if (navigator.usb) {
+    talkToArduino();
+  } else {
+    alert('WebUSB not supported.');
+  }
+});
+async function talkToArduino() {
+  try {
+    let device = await navigator.usb.requestDevice({ filters: [{ vendorId: 0x8086 }] });
+    await device.open(); // Begin a session.
+    await device.selectConfiguration(1); // Select configuration #1 for the device.
+    await device.claimInterface(2); // Request exclusive control over interface #2.
+    await device.controlTransferOut({
+      requestType: 'class',
+      recipient: 'interface',
+      request: 0x22,
+      value: 0x01,
+      index: 0x02
+    });
+  
+    // Ready to receive data
+    let result = device.transferIn(5, 64); // Waiting for 64 bytes of data from endpoint #5.
+    let decoder = new TextDecoder();
+    document.getElementById('target').innerHTML = 'Received: ' + decoder.decode(result.data);
+  } catch (error) {
+    document.getElementById('target').innerHTML = error;
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+{
+  "name": "PWA Add to Homescreen",
+  "short_name": "A2HC",
+  "icons": [
+    {
+      "src": "logo192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+	{
+      "src": "logo256.png",
+      "type": "image/png",
+      "sizes": "256x256"
+    },
+    {
+      "src": "logo512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/pwa/data/diri/pwa",
+  "background_color": "#ffaa00",
+  "theme_color": "#ffaa00",
+  "display": "standalone"
+}

@@ -1,0 +1,24 @@
+.card {
+  margin: 15px;
+}
+
+.container {
+  text-align: center;
+}
+
+.s3 {
+	color:#0000ff;
+}
+.background{
+	background-image: url("../images/side-nav-bg@2x.jpg");
+	
+}
+.userView{
+	color:#ffffff;
+}
+
+.container{
+	width: 100%;
+	max-width:initial;
+> .row{	margin: 0; > .col{ padding: 0; }}
+}

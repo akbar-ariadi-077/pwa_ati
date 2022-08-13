@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Demo Recording Media</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <style>
+	.navbar-header{float:left;padding:12px;text-align:center;width:100%;}
+	.navbar-brand{float:none;font-weight:bold;}
+  </style>
+</head>
+<body>
+<nav class="navbar navbar-default" role="navigation">
+  <div class="navbar-header">
+    <span class="navbar-brand">Demo Recording Media</span>
+  </div>
+</nav>
+<div class="container">
+<video autoplay style="height:180px; width: 240px;" poster="https://image.freepik.com/free-icon/video-camera-symbol_318-40225.png"></video>
+<p><button class="btn btn-lg btn-default" onclick="getStream()">Grab video & start recording</button></p>
+<p><button class="btn btn-lg btn-default" onclick="download()">Download!</button></p>
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script>
+function getUserMedia(options, successCallback, failureCallback) {
+  var api = navigator.getUserMedia || navigator.webkitGetUserMedia ||
+    navigator.mozGetUserMedia || navigator.msGetUserMedia;
+  if (api) {
+    return api.bind(navigator)(options, successCallback, failureCallback);
+  }
+}
+var theStream;
+var theRecorder;
+var recordedChunks = [];
+function getStream() {
+  if (!navigator.getUserMedia && !navigator.webkitGetUserMedia &&
+    !navigator.mozGetUserMedia && !navigator.msGetUserMedia) {
+    alert('User Media API not supported.');
+    return;
+  }
+  var constraints = {video: true, audio: true};
+  getUserMedia(constraints, function (stream) {
+    var mediaControl = document.querySelector('video');
+    
+    if ('srcObject' in mediaControl) {
+      mediaControl.srcObject = stream;
+      mediaControl.src = (window.URL || window.webkitURL).createObjectURL(stream);
+    } else if (navigator.mozGetUserMedia) {
+      mediaControl.mozSrcObject = stream;
+    }
+    theStream = stream;
+    try {
+      recorder = new MediaRecorder(stream, {mimeType : "video/webm"});
+    } catch (e) {
+      console.error('Exception while creating MediaRecorder: ' + e);
+      return;
+    }
+    theRecorder = recorder;
+    console.log('MediaRecorder created');
+    recorder.ondataavailable = recorderOnDataAvailable;
+    recorder.start(100);
+  }, function (err) {
+    alert('Error: ' + err);
+  });
+}
+
+function recorderOnDataAvailable(event) {
+  if (event.data.size == 0) return;
+  recordedChunks.push(event.data);
+}
+
+function download() {
+  console.log('Saving data');
+  theRecorder.stop();
+  theStream.getTracks()[0].stop();
+
+  var blob = new Blob(recordedChunks, {type: "video/webm"});
+  var url = (window.URL || window.webkitURL).createObjectURL(blob);
+  var a = document.createElement("a");
+  document.body.appendChild(a);
+  a.style = "display: none";
+  a.href = url;
+  a.download = 'test.webm';
+  a.click();
+  
+  // setTimeout() here is needed for Firefox.
+  setTimeout(function () {
+      (window.URL || window.webkitURL).revokeObjectURL(url);
+  }, 100); 
+}
+</script>
+</body>
+</html>

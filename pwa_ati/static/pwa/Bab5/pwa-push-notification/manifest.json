@@ -1,0 +1,18 @@
+{
+  "name": "PWA Push Notification",
+  "short_name": "Notification",
+  "version": "1.0.0",
+  "description": "Demo Push Notification",
+  "author": "kampushendra.com",
+  "start_url": "./",
+  "scope": "./",
+  "background_color": "#ffaa00",
+  "theme_color": "#ffaa00",
+  "display": "standalone",
+  "orientation": "portrait",
+  "gcm_sender_id": "956814356639",
+  "icons": [{
+        "src": "images/notification.png",
+        "sizes": "192x192"
+	}]
+}

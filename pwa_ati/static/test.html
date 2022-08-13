@@ -1,0 +1,23 @@
+<html>
+	<head>
+		<script type="text/javascript" src="/web/static/lib/jquery/jquery.js"></script>
+		<script type="text/javascript">
+			$(document).ready(function() {
+				$('#submit').click(function(){
+					$.post('/pwa/data/diri', {
+						'nama': $('#nama').val(),
+						'alamat': $('#alamat').val()
+					}, function(data){
+						$('#output').html(data);
+					});
+				});
+			});
+		</script>
+	</head>
+	<body>
+		Nama : <input type="text" id="nama"/><br/>
+		Alamat : <input type="text" id="alamat"/><br/>
+		<input type="button" id="submit" value="Submit"/>
+		<div id="output"/>
+	</body>
+</html>

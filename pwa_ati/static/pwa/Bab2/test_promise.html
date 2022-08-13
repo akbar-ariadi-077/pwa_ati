@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Demo Promises</title>
+</head>
+<body>
+  <button id="btn">Run promise!</button>
+<div id="log"></div>
+<script>
+var promiseCount = 0;
+function testPromise() {
+    var thisPromiseCount = ++promiseCount;
+    var log = document.getElementById('log');
+    log.insertAdjacentHTML('beforeend', thisPromiseCount + '- Started : Sync code started<br/>');
+    // Create new promise: we promise a numeric count of this promise, starting from 1 (after waiting 3s)
+    let p1 = new Promise(
+        // The resolver function is called with the ability to resolve or
+        // reject the promise
+       (resolve, reject) => {
+            log.insertAdjacentHTML('beforeend', thisPromiseCount +
+                '- Promise started : Async code started<br/>');
+            // This is only an example to create asynchronism
+            window.setTimeout(
+                function() {
+                    // We fulfill the promise !
+                    resolve(thisPromiseCount);
+                }, Math.random() * 2000 + 1000);
+        }
+    );
+
+    // We define what to do when the promise is resolved with the then() call,
+    // and what to do when the promise is rejected with the catch() call
+    p1.then(
+        // Log the fulfillment value
+        function(val) {
+            log.insertAdjacentHTML('beforeend', val +
+                '- Promise fulfilled : Async code terminated<br/>');
+        }).catch(
+        // Log the rejection reason
+       (reason) => {
+            console.log('Handle rejected promise ('+reason+') here.');
+        });
+
+    log.insertAdjacentHTML('beforeend', thisPromiseCount +
+        '- Promise made : Sync code terminated<br/>');
+}if ("Promise" in window) {
+  let btn = document.getElementById("btn");
+  btn.addEventListener("click",testPromise);
+} else {
+  log = document.getElementById('log');
+  log.innerHTML = "Live example not available as your browser doesn't support the <code>Promise<code> interface.";
+}
+</script>
+</body>
+</html>

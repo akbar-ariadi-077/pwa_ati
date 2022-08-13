@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Demo API Touch Gestures</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <style>
+	.navbar-header{float:left;padding:12px;text-align:center;width:100%;}
+	.navbar-brand{float:none;font-weight:bold;}
+	.test-element {
+	  height: 100px;
+	  background-color: black;
+	  width: 100px;
+	  z-index: 5;
+	  position: absolute;
+	  top: 150px;
+	  left: 150px;
+	  color: white;
+	  text-align: center;
+	  -ms-touch-action: none;
+	}
+	.test-element:nth-child(2) {
+	  top: 50px;
+	  left: 50px;
+	}
+	.test-element:nth-child(3) {
+	  top: 100px;
+	  left: 100px;
+	}
+  </style>
+</head>
+<body>
+<nav class="navbar navbar-default" role="navigation">
+  <div class="navbar-header">
+    <span class="navbar-brand">Demo API Touch Gestures</span>
+  </div>
+</nav>
+<div class="container" style="margin-top: 10px">
+	<div class="test-element">Drag dengan 1 jari</div>
+	<div class="test-element">Drag dengan jari lain</div>
+	<div class="test-element">Drag dengan jari lain juga</div>
+	<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+	<p><small>Based on demo from <a href="https://www.quirksmode.org/m/tests/drag2.html">QuirksMode.org</a>.</small></p>
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script>
+function startDrag(e) {
+  this.ontouchmove = this.onmspointermove = moveDrag;
+  this.ontouchend = this.onmspointerup = function () {
+    this.ontouchmove = this.onmspointermove = null;
+    this.ontouchend = this.onmspointerup = null;
+  }
+
+  var pos = [this.offsetLeft, this.offsetTop];
+  var that = this;
+  var origin = getCoors(e);
+
+  function moveDrag(e) {
+    var currentPos = getCoors(e);
+    var deltaX = currentPos[0] - origin[0];
+    var deltaY = currentPos[1] - origin[1];
+    this.style.left = (pos[0] + deltaX) + 'px';
+    this.style.top = (pos[1] + deltaY) + 'px';
+    return false; // cancels scrolling
+  }
+
+  function getCoors(e) {
+    var coors = [];
+    if (e.targetTouches && e.targetTouches.length) {
+      var thisTouch = e.targetTouches[0];
+      coors[0] = thisTouch.clientX;
+      coors[1] = thisTouch.clientY;
+    } else {
+      coors[0] = e.clientX;
+      coors[1] = e.clientY;
+    }
+    return coors;
+  }
+}
+
+var elements = document.querySelectorAll('.test-element');
+[].forEach.call(elements, function (element) {
+  element.ontouchstart = element.onmspointerdown = startDrag;
+});
+
+document.ongesturechange = function () {
+  return false;
+}
+</script>
+</body>
+</html>

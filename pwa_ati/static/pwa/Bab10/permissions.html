@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Demo API Permission</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <style>
+	.navbar-header{float:left;padding:12px;text-align:center;width:100%;}
+	.navbar-brand{float:none;font-weight:bold;}
+  </style>
+</head>
+<body>
+<nav class="navbar navbar-default" role="navigation">
+  <div class="navbar-header">
+    <span class="navbar-brand">Demo API Permission</span>
+  </div>
+</nav>
+<div class="container">
+<div>
+  <p>
+    <b><a href="geolocation.html">Geolocation</a></b> permission status = <b id="geolocation-status">unknown</b>.
+    <button class="btn btn-sm btn-default" onclick="requestGeolocation()">Request</button>
+  </p>
+  <p>
+    <b><a href="local-notifications.html">Notifications</a></b> permission status = <b id="notifications-status">unknown</b>.
+    <button class="btn btn-default" onclick="requestNotifications()">Request</button>
+  </p>
+  <p>
+    <b><a href="push-notifications.html">Push</a></b> permission status = <b id="push-status">unknown</b>.
+    <button class="btn btn-default" onclick="requestPush()">Request</button>
+  </p>
+  <p>
+    <b>Midi</b> permission status = <b id="midi-status">unknown</b>.
+    <button class="btn btn-default" onclick="requestMidi()">Request</button>
+  </p>
+  <p>
+    <b><a href="camera-microphone.html">Camera</a></b> permission status = <b id="camera-status">unknown</b>.
+    <button class="btn btn-default" onclick="requestCamera()">Request</button>
+  </p>
+  <p>
+    <b><a href="camera-microphone.html">Microphone</a></b> permission status = <b id="microphone-status">unknown</b>.
+    <button class="btn btn-default" onclick="requestMicrophone()">Request</button>
+  </p>
+  <p>
+    <b><a href="background-sync.html">Background Sync</a></b> permission status = <b id="background-sync-status">unknown</b>.
+  </p>
+  <p>
+    <b><a href="ambient-light.html">Ambient Light Sensor</a></b> permission status = <b id="ambient-light-sensor-status">unknown</b>.
+  </p>
+  <p>
+    <b><a href="device-motion.html">Accelerometer</a></b> permission status = <b id="accelerometer-status">unknown</b>.
+  </p>
+  <p>
+    <b><a href="device-motion.html">Gyroscope</a></b> permission status = <b id="gyroscope-status">unknown</b>.
+  </p>
+  <p>
+    <b><a href="device-motion.html">Magnetometer</a></b> permission status = <b id="magnetometer-status">unknown</b>.
+  </p>
+</div>
+
+<p id="logTarget"></p>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script>
+if ('permissions' in navigator) {
+  var logTarget = document.getElementById('logTarget');
+
+  function handleChange(permissionName, newState) {
+    var timeBadge = new Date().toTimeString().split(' ')[0];
+    var newStateInfo = document.createElement('p');
+    newStateInfo.innerHTML = '<span class="badge">' + timeBadge + '</span> State of <b>' + permissionName + '</b> permission status changed to <b>' + newState + '</b>.';
+    logTarget.appendChild(newStateInfo);
+  }
+
+  function checkPermission(permissionName, descriptor) {
+    try {
+    navigator.permissions.query(Object.assign({name: permissionName}, descriptor))
+      .then(function (permission) {
+        document.getElementById(permissionName + '-status').innerHTML = permission.state;
+        permission.addEventListener('change', function (e) {
+          document.getElementById(permissionName + '-status').innerHTML = permission.state;
+          handleChange(permissionName, permission.state);
+        });
+      });
+    } catch (e) {
+    }
+  }
+
+  checkPermission('geolocation');
+  checkPermission('notifications');
+  checkPermission('push', {userVisibleOnly: true});
+  checkPermission('midi', {sysex: true});
+  checkPermission('camera');
+  checkPermission('microphone');
+  checkPermission('background-sync');
+  checkPermission('ambient-light-sensor');
+  checkPermission('accelerometer');
+  checkPermission('gyroscope');
+  checkPermission('magnetometer');
+
+  var noop = function () {};
+  navigator.getUserMedia = (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia);
+  
+  function requestGeolocation() {
+    navigator.geolocation.getCurrentPosition(noop);
+  }
+
+  function requestNotifications() {
+    Notification.requestPermission();
+  }
+
+  function requestPush() {
+    navigator.serviceWorker.getRegistration()
+      .then(function (serviceWorkerRegistration) {
+        serviceWorkerRegistration.pushManager.subscribe();
+      });
+  }
+
+  function requestMidi() {
+    navigator.requestMIDIAccess({sysex: true});
+  }
+  
+  function requestCamera() {
+    navigator.getUserMedia({video: true}, noop, noop)
+  }
+  
+  function requestMicrophone() {
+    navigator.getUserMedia({audio: true}, noop, noop)
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Demo API Clipboard</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <style>
+	.navbar-header{float:left;padding:12px;text-align:center;width:100%;}
+	.navbar-brand{float:none;font-weight:bold;}
+  </style>
+</head>
+<body>
+<nav class="navbar navbar-default" role="navigation">
+  <div class="navbar-header">
+    <span class="navbar-brand">Demo API Clipboard</span>
+  </div>
+</nav>
+<div class="container" style="margin-top: 10px">
+	<p class="heading">Use the forms below for programmatic clipboard access or invoke standard copy/cut/paste operations with your keyboard.</p>
+	<section>
+	  <label><input type="radio" name="api" value="sync"> Use older, synchronous API</label><br/>
+	  <label><input type="radio" name="api" value="async" checked> Use newer, asynchronous API</label>
+	</section>
+	<section>
+	  <h2>Cut/Paste Example</h2>
+	  <p><textarea class="js-cuttextarea form-control">Hello! Cut me programatically or maybe try pasting here.</textarea></p>
+	  <p><button class="js-textareacutbtn btn btn-default">Cut text programatically</button></p>
+	</section>
+	<section>
+	  <h2>Copy Example</h2>
+	  <p>Email me at <a class="js-emaillink" href="mailto:matt@example.co.uk">matt@example.co.uk</a></p>
+	  <p>
+		<button class="js-emailcopybtn btn btn-default">Copy Email Address programatically</button>
+	  </p>
+	</section>
+	<p id="logTarget"></p>
+	<p><small>Demo based on <a href="https://googlechrome.github.io/samples/cut-and-copy/index.html" target="_blank">Google Chrome examples</a>.</small></p>
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script>
+var logTarget = document.getElementById('logTarget');
+
+function useAsyncApi() {
+  return document.querySelector('input[value=async]').checked;
+}
+
+function log(event) {
+  var timeBadge = new Date().toTimeString().split(' ')[0];
+  var newInfo = document.createElement('p');
+  newInfo.innerHTML = '<span class="badge">' + timeBadge + '</span> ' + event + '</b>.';
+  logTarget.appendChild(newInfo);
+}
+
+function performCopyEmail() {
+  var selection = window.getSelection();
+  var emailLink = document.querySelector('.js-emaillink');
+
+  if (useAsyncApi()) {
+    navigator.clipboard.writeText(emailLink.textContent)
+      .then(() => log('Async writeText successful, "' + emailLink.textContent + '" written'))
+      .catch(err => log('Async writeText failed with error: "' + err + '"'));
+  } else {
+    selection.removeAllRanges();
+    var range = document.createRange();
+    range.selectNode(emailLink);
+    selection.addRange(range);
+  
+    try {
+      var successful = document.execCommand('copy');
+      var msg = successful ? 'successful' : 'unsuccessful';
+      log('Copy email command was ' + msg);
+    } catch (err) {
+      log('execCommand Error', err);
+    }
+    
+    selection.removeAllRanges();
+  }
+}
+
+function performCutTextarea() {
+  var cutTextarea = document.querySelector('.js-cuttextarea');
+
+  if (useAsyncApi()) {
+    navigator.clipboard.writeText(cutTextarea.textContent)
+      .then(() => {
+        log('Async writeText successful, "' + cutTextarea.textContent + '" written');
+        cutTextarea.textContent = '';
+      })
+      .catch(err => log('Async writeText failed with error: "' + err + '"'));
+  } else {
+    var hasSelection = document.queryCommandEnabled('cut');
+    cutTextarea.select();
+  
+    try {
+      var successful = document.execCommand('cut');
+      var msg = successful ? 'successful' : 'unsuccessful';
+      log('Cutting text command was ' + msg);
+    } catch (err) {
+      log('execCommand Error', err);
+    }
+  }
+}
+
+// Get the buttons
+var cutTextareaBtn = document.querySelector('.js-textareacutbtn');
+var copyEmailBtn = document.querySelector('.js-emailcopybtn');
+
+// Add click event listeners
+copyEmailBtn.addEventListener('click', performCopyEmail);
+cutTextareaBtn.addEventListener('click', performCutTextarea);
+
+function logUserOperation(event) {
+  log('User performed <b>' + event.type + '</b> operation. Payload is: <b>' + event.clipboardData.getData('text/plain') + '</b>');
+}
+
+document.addEventListener('cut', logUserOperation);
+document.addEventListener('copy', logUserOperation);
+document.addEventListener('paste', logUserOperation);
+</script>
+</body>
+</html>

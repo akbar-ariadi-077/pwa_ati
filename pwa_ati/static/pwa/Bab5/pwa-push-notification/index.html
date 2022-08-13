@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
+  <title>PWA Push Notification</title>
+  <script src="https://www.gstatic.com/firebasejs/5.5.0/firebase.js"></script>
+<script>
+	// Initialize Firebase
+	var config = {
+		apiKey: "AIzaSyCMGTf96Sslm3HGyY7ssEcXPGICRyimDIc",
+		authDomain: "sisfoku-8b881.firebaseapp.com",
+		databaseURL: "https://sisfoku-8b881.firebaseio.com",
+		projectId: "sisfoku-8b881",
+		storageBucket: "sisfoku-8b881.appspot.com",
+		messagingSenderId: "956814356639"
+	};
+	firebase.initializeApp(config);
+  
+	// Retrieve Firebase Messaging object.
+	const messaging = firebase.messaging();
+	
+	messaging.onMessage(function(payload) {
+	  console.log("Message received. ", payload);
+	  //notificationTitle = payload.data.title;
+	  notificationTitle = payload.data.title;
+	  notificationOptions = {
+	  	body: payload.data.body,
+	  	icon: payload.data.icon,
+	  	image: payload.data.image
+	  };
+	  var notification = new Notification(notificationTitle,notificationOptions);
+	});
+</script>
+<link rel="manifest" href="manifest.json">
+</head>
+<body>
+  <h1>Demo PWA Push Notification </h1>
+  <p></p>
+  <p><button class="js-notify-btn">Notify me!</button></p>
+  <p><button disabled class="js-push-btn">Subscribe me! </button></p>
+  <br>
+  <section class="js-sub-endpoint" style="display:none;width:80%">
+    <h3>Subscription Object:</h3>
+    <code class="js-subscription-json"></code><br><br><br>
+    <h3>Endpoint URL:</h3>
+    <code class="js-endpoint-url"></code>
+  </section>
+
+  <script src="js/main.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Demo HTML5 Sensor</title>
+</head>
+<body>
+	<button id="geolocation" onclick="geolocation(false)" style="font-size:150%">Geolocation</button>
+	<button id="geolocationha" onclick="geolocation(true)" style="font-size:150%">Geolocation - High Accuracy</button>
+	<button id="vibration" onclick="vibrate()" style="font-size:150%">Vibrate</button>
+	<button id="position" onclick="position()" style="font-size:150%">Position</button>
+	<button id="acceleration" onclick="acceleration()" style="font-size:150%">Acceleration</button>
+	<button id="battery" onclick="battery()" style="font-size:150%">Battery</button>
+	<button id="devicelight" onclick="devicelight()" style="font-size:150%">Device Light</button>
+	<button id="lightlevel" onclick="lightlevel()" style="font-size:150%">Light Level</button>
+	<button id="deviceproximity" onclick="deviceproximity()" style="font-size:150%">Device Proximity</button>
+	<button id="userproximity" onclick="userproximity()" style="font-size:150%">User Proximity</button>
+	<button id="camera" onclick="camera()" style="font-size:150%">Start Camera</button>
+	<input type=file accept=image/* capture=camera>Take a photo</input>
+	<p id="output"></p>
+	<video id="video"></video>
+	<script type="text/javascript">
+		var x=document.getElementById("output");
+		var posEnabl = false, accEnabl = false, devicelightEnabl = false, lightlevelEnabl = false, deviceproximityEnabl = false, userproximityEnabl = false;
+		
+		var posHandler = function(event) {
+			x.innerHTML='Position <br/> Alpha: ' + event.alpha + ' <br/> Beta: ' + event.beta + ' <br/> Gamma: ' + 	event.gamma;
+		}
+		var accHandler = function(event) {
+			x.innerHTML='Acceleration <br/> X: ' + event.acceleration.x + '<br/> Y: ' + event.acceleration.y + '<br/> Z: ' + event.acceleration.z + '<br/>' +
+			'Acceleration including gravity <br/> X: ' + event.accelerationIncludingGravity.x + '<br/> Y: ' + event.accelerationIncludingGravity.y + '<br/> Z: ' + event.accelerationIncludingGravity.z + '<br/>' +
+			'Rotation rate <br/> Alfa: ' + event.rotationRate.alpha + '<br/> Béta: ' + event.rotationRate.beta + '<br/> Gamma: ' + event.rotationRate.gamma + '<br/>' + 
+			'Interval: ' + event.interval;
+		}
+		var devicelightHandler = function(event) {
+			x.innerHTML='Device light: ' + event.value;
+		}
+		var lightlevelHandler = function(event) {
+			x.innerHTML='Light level: ' + event.value;
+		}
+		var deviceproximityHandler = function(event) {
+			x.innerHTML='Device proximity value: ' + event.value + ', min: ' + event.min + ', max: ' + event.max;
+		}
+		var userproximityHandler = function(event) {
+			x.innerHTML='User proximity: ' + event.near;
+		}
+		
+		function geolocation(accuracy) {
+			if (navigator.geolocation) {
+				navigator.geolocation.getCurrentPosition(success, fail, {enableHighAccuracy:accuracy});
+			} else {
+				fail();
+			}
+			function success(position) {
+				x.innerHTML='Latitude: ' + position.coords.latitude + 
+				', Longitude: ' + position.coords.longitude;
+			}
+			function fail() {
+				x.innerHTML='Error during reading location data!';
+			}
+		}
+		
+		function vibrate() {
+			navigator.vibrate(1000);
+		}
+		
+		window.addEventListener("compassneedscalibration", function(event) {
+			alert('Compass needs recalibration! Wave the device in an eight-figure!');
+			event.preventDefault();
+		}, false);
+		
+		function position() {
+			if (posEnabl) {
+				window.removeEventListener("deviceorientation", posHandler, false);
+				posEnabl = false;
+				x.innerHTML='';
+			} else {
+				window.addEventListener("deviceorientation", posHandler, false);
+				posEnabl = true;
+			}
+		}
+		
+		function acceleration() {
+			if (accEnabl) {
+				window.removeEventListener("devicemotion", accHandler, false);
+				accEnabl = false;
+				x.innerHTML='';
+			} else {
+				window.addEventListener("devicemotion", accHandler, false);
+				accEnabl = true;
+			}
+		}
+		
+		function battery() {
+			var battery = navigator.battery || navigator.webkitBattery;
+
+			x.innerHTML='Battery Status: ' + battery.level;
+		}
+		
+		function devicelight() {
+			if (devicelightEnabl) {
+				window.removeEventListener("devicelight", devicelightHandler, false);
+				devicelightEnabl = false;
+				x.innerHTML='';
+			} else {
+				window.addEventListener("devicelight", devicelightHandler, false);
+				devicelightEnabl = true;
+			}
+		}
+		
+		function lightlevel() {
+			if (lightlevelEnabl) {
+				window.removeEventListener("lightlevel", lightlevelHandler, false);
+				lightlevelEnabl = false;
+				x.innerHTML='';
+			} else {
+				window.addEventListener("lightlevel", lightlevelHandler, false);
+				lightlevelEnabl = true;
+			}
+		}
+		
+		function deviceproximity() {
+			if (deviceproximityEnabl) {
+				window.removeEventListener("deviceproximity", deviceproximityHandler, false);
+				deviceproximityEnabl = false;
+				x.innerHTML='';
+			} else {
+				window.addEventListener("deviceproximity", deviceproximityHandler, false);
+				deviceproximityEnabl = true;
+			}
+		}
+		
+		function userproximity() {
+			if (userproximityEnabl) {
+				window.removeEventListener("userproximity", userproximityHandler, false);
+				userproximityEnabl = false;
+				x.innerHTML='';
+			} else {
+				window.addEventListener("userproximity", userproximityHandler, false);
+				userproximityEnabl = true;
+			}
+		}
+		
+		function camera() {
+			var streaming = false,
+			video        = document.querySelector('#video'),
+			width = 320,
+			height = 0;
+		
+			navigator.getMedia = ( navigator.getUserMedia ||
+                         navigator.webkitGetUserMedia ||
+                         navigator.mozGetUserMedia ||
+                         navigator.msGetUserMedia);
+				
+			navigator.getMedia(
+				//constraints
+				{
+					video: true, 
+					audio: true
+				}, 
+				//successCallback
+				function(stream) {
+					if (navigator.mozGetUserMedia) {
+						video.mozSrcObject = stream;
+					} else {
+						var vendorURL = window.URL || window.webkitURL;
+						video.src = vendorURL.createObjectURL(stream);
+					}
+					video.play();
+				},
+				//errorCallback
+				function(err) {
+					alert('The following error occurred: ' + err);
+				}
+			);
+			
+			video.addEventListener('canplay', function(ev){
+				if (!streaming) {
+				  height = video.videoHeight / (video.videoWidth/width);
+				  video.setAttribute('width', width);
+				  video.setAttribute('height', height);
+				  streaming = true;
+				}
+			}, false);
+		}	
+	</script>
+</body>
+</html>
